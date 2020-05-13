@@ -18,5 +18,10 @@ c.execute('''INSERT INTO users(username,password)
 c.execute('''INSERT INTO users(username,password)
               VALUES ('user1','test')''')
 
+#fetch all data from table:
+c.execute("SELECT * FROM users ")
+rows = c.fetchall()
+print(rows)
+
 con.commit()
 con.close()
