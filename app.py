@@ -7,7 +7,7 @@ con = sql.connect('users.db')
 c =  con.cursor()
 
 app = Flask(__name__)
-#app.secret_key = "super secret key"
+
 
 @app.route('/',methods=['GET','POST'])
 def home():
