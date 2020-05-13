@@ -15,24 +15,39 @@ def home():
 
 @app.route('/login',methods=['POST','GET'])
 def login():
-    error = None
-    response = False
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         con = sql.connect('users.db')
         with con:
             c = con.cursor()
-            c.execute("SELECT * FROM users")
-            rows = c.fetchall()
-            for row in rows :
-                user = row[1]
-                pwd = row[2]
-                if user == username and pwd == password :
-                    return render_template('logged_in.html')
-                else :
-                    return render_template('index1.html')
-            
+            c.execute('''SELECT * FROM users WHERE username = (?) and password =(?) ''',(username,password, ))
+            rows = c.fetchone()
+            if rows[1] == username and rows[2] == password :
+                return render_template('logged_in.html')
+            else :
+                return render_template('index1.html')
+                
+@app.route('/sign',methods = ['GET','POST'])
+def sign():
+    return render_template("signup.html")
+
+@app.route('/signup',methods=['POST','GET'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        repassword = request.form['repassword']
+        con = sql.connect('users.db')
+        with con:
+            c = con.cursor()
+            if password == repassword :
+                c.execute('''INSERT INTO users (username ,password) VALUES (?,?)''',(username,password))
+                return render_template("index1.html")
+            else :
+                return render_template('signup.html')
+
+
 if __name__ == '__main__' :
     app.run(debug=True )
 
