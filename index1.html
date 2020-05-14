@@ -1,14 +1,44 @@
+<!DOCTYPE html>
 <HTML>
-<BODY bgcolor="cyan">
-<form method="POST" action="/login">
-    <center>
-    <H1>Enter your details </H1> <br>
-    Username: <input type = "username" name= "username" /> <br>
-    <br>
-    Password: <input type = "password" name = "password" /> <br>
-    <br>
-    <input type = "submit" value = "submit">
-    </center>
-</form>
-</BODY>
+<head>
+   <title>New login</title>
+   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<BODY style="background-color :cyan">
+	<div class="modal-dialog modal-dialog-centered modal-sm">
+		<div class= "modal-content">
+			<div class= "modal-body">
+				<div class = "text-center">
+					<h2> Log In </h2>
+				</div>
+				<br>
+				<form class="form center block" method ="post" action= "/login">
+					<div class= "form-group row">
+						<div class ="col-sm-12">
+							<label for= "Username">Username :</label>
+							<input type= "username" name= "username" class="form-control" id="username" placeholder="username" >
+						</div>
+					</div>
+					<br>
+				        <div class= "form-group row">
+						<div class= "col-sm-12">
+							<label for="Password">Password :</label>
+							<input type= "password"	name= "password" class="form-control" id="password" placeholder="password">
+						</div>
+					</div>
+					<br>
+					<div class= "form-group row">
+						<div class= "col-sm-12">
+							<div class="text-center">
+								<button type= "submit" class= "btn btn-primary btn-md"> Log In </button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>					
 </HTML>
