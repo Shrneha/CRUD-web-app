@@ -10,8 +10,8 @@ c =  con.cursor()
 c.execute('''drop table if exists users ''')
 c.execute('''    CREATE TABLE users(
         id INTEGER PRIMARY KEY ,
-        username TEXT NOT NULL ,
-        password TEXT NOT NULL
+        username  NOT NULL UNIQUE ,
+        password  NOT NULL
         );''')
 c.execute('''INSERT INTO users(username,password)
               VALUES ('admin','100')''')
