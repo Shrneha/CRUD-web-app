@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+	
+
 <HTML>
 <head>
    <title>New login</title>
@@ -6,15 +8,16 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+
 <BODY style="background-color :cyan">
 	<div class="modal-dialog modal-dialog-centered modal-sm">
 		<div class= "modal-content">
 			<div class= "modal-body">
 				<div class = "text-center">
 					<h2> Log In </h2>
-				</div>
-				<br>
+				</div><br>
 				<form class="form center block" method ="post" action= "/login">
+
 					<div class= "form-group row">
 						<div class ="col-sm-12">
 							<label for= "Username">Username :</label>
@@ -27,8 +30,18 @@
 							<label for="Password">Password :</label>
 							<input type= "password"	name= "password" class="form-control" id="password" placeholder="password">
 						</div>
-					</div>
-					<br>
+					</div><br>
+					{% with messages = get_flashed_messages() %}
+    				    	    {% if messages %}
+        					{% for message in messages %}
+            						<div class="alert alert-info alert-dismissible  " role="alert">
+								<span class="close" data-dismiss="alert" aria-label="close">&times;</span>
+                						<span>{{ message }}</span>
+            						</div>
+        					{% endfor %}
+    				            {% endif %}
+					{% endwith %}
+					
 					<div class= "form-group row">
 						<div class= "col-sm-12">
 							<div class="text-center">
@@ -40,10 +53,11 @@
 					<div class= "form-group row">
 						<div class= "col-sm-12">
 							<div class= "text-center">
-								<p> New user? Click <a href="signup.html">here</a> to register</p>
+								<p class="active">New User? Click <a href="/sign">here</a> to register </p>
 							</div>
 						</div>
 					</div>
+   
 				</form>
 			</div>
 		</div>
