@@ -39,6 +39,16 @@
 							<input type="password" name="repassword" class="form-control" id="password" placeholder="password">
 						</div>
 					</div>
+					{% with messages = get_flashed_messages() %}
+    				    	    {% if messages %}
+        					{% for message in messages %}
+            						<div class="alert alert-info alert-dismissible  " role="alert">
+								<span class="close" data-dismiss="alert" aria-label="close">&times;</span>
+                						<span>{{ message }}</span>
+            						</div>
+        					{% endfor %}
+    				            {% endif %}
+					{% endwith %}
 					<div class="form-group row">
 						<div class="col-sm-12">
 							<div class="text-center">
@@ -49,7 +59,7 @@
 					<div class= "form-group row">
 						<div class= "col-sm-12">
 							<div class= "text-center">
-								<p>Registered already? Click <a href="index1.html">here</a> to Log In</p>
+								<p>Registered already? Click <a href="/">here</a> to Log In</p>
 							</div>
 						</div>
 					</div>
