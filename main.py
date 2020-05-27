@@ -15,28 +15,59 @@ app.config['MYSQL_DATABASE_PORT']= '3306'
 app.config['SECRET_KEY'] = "My Super Secret Key"
 mysql = MySQL(app)
 
-class Database:
-    def __init__(self):
-        host = "127.0.0.1"
-        user = "admin"
-        password = "admin"
-        db = "test"
+@app.route('/session/emp',methods=['GET','POST'])
+def list_employees():
+    username = session["username"]
+    cur = mysql.connection.cursor()
+    if 'admin' in username :
+        cur.execute("SELECT * FROM users")
+        result = cur.fetchall()
+        cur.close()
+        return render_template('employees.html', users=result, username = username)
+    else :
+        cur.execute("SELECT * FROM users where username = %s",(username,) )
+        result = cur.fetchall()
+        cur.close()
+        return render_template('employees.html', users=result, username = username)
 
-        self.con = pymysql.connect(host=host, user=user, password=password, db=db, cursorclass=pymysql.cursors.DictCursor)
-        self.cur = self.con.cursor()
 
-    def list_employees(self):
-        username = session["username"]
-        if username == "admin" :
-            self.cur.execute("SELECT id, username, dept_id,user_id FROM users")
-            result = self.cur.fetchall()
-        else :
-            self.cur.execute('''SELECT id,username,dept_id,user_id FROM users WHERE username = %s ''' ,[username])
-            result = self.cur.fetchall()
-        return result
+@app.route('/update', methods=["POST"])
+def update():
+    id_data = request.form['id']
+    username = request.form['username']
+    password = request.form['password']
+    dept_id = request.form['dept_id']
+    user_id = request.form['user_id']
+    cur = mysql.connection.cursor()
+    cur.execute('''UPDATE users
+                SET username=%s,password=%s, dept_id=%s ,user_id=%s
+                WHERE id=%s''', (username,password,dept_id,user_id, id_data,))
+    mysql.connection.commit()
+    return redirect(url_for('list_employees'))
 
-    def update_employees(self):
-        self.cur.execute("")
+@app.route('/delete/<string:id_data>', methods=["GET"])
+def delete(id_data):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM users WHERE id=%s", (id_data,))
+    mysql.connection.commit()
+    return redirect(url_for('list_employees'))
+
+@app.route('/add_user',methods =["POST"])
+def add_user():
+    username = request.form['username']
+    password = request.form['password']
+    dept_id = request.form['dept_id']
+    user_id = request.form['user_id']
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO users (username,password,dept_id,user_id) VALUES (%s,%s,%s,%s)",(username,password,dept_id,user_id))
+    mysql.connection.commit()
+    return redirect(url_for('list_employees'))
+
+
+##@app.route('/update_emp', methods=['GET', 'POST'])
+##def up():
+##    username = session["username"]
+##    return render_template('update_emp.html')
 
     
 @app.route('/', methods=['GET', 'POST'])
@@ -77,17 +108,6 @@ def sess():
         return render_template('index1.html')
     
 
-@app.route('/session/emp',methods=['GET','POST'])
-def employees():
-    username = session["username"]
-    def db_query():
-        db = Database()
-        emps = db.list_employees()
-        return emps
-    res = db_query()
-    return render_template('employees.html', result=res,username = username)
-                
-
 @app.route('/sign',methods = ['GET','POST'])
 def sign():
     return render_template("signup.html")
@@ -127,3 +147,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
