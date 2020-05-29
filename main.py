@@ -14,22 +14,27 @@ app.config['MYSQL_DB'] = 'test'
 app.config['MYSQL_DATABASE_PORT']= '3306'
 app.config['SECRET_KEY'] = "My Super Secret Key"
 mysql = MySQL(app)
-#cur = mysql.connection.cursor()
 
+## List table rows
 @app.route('/session/emp',methods=['GET','POST'])
 def list_employees():
     username = session["username"]
     cur = mysql.connection.cursor()
-    if 'admin' in username :
+    cur.execute(''' SELECT users.username ,userprofile.is_admin
+                                  FROM users
+                                  LEFT JOIN userprofile ON users.user_id = userprofile.user_id
+                                  WHERE username = %s ''',(username,))
+    result = cur.fetchone()
+    if result[1] == 1 :
         cur.execute("SELECT * FROM users")
         result = cur.fetchall()
         cur.close()
         return render_template('admin_employees.html', users=result, username = username)
     else :
-        cur.execute("SELECT * FROM users where username = %s",(username,) )
+        cur.execute ("SELECT * FROM users where username = %s",(username,))
         result = cur.fetchall()
         cur.close()
-        return render_template('employees.html', users=result, username = username)
+        return render_template('employees.html', users=result, username = username)\
 
 @app.route('/session/dept',methods =['GET','POST'])
 def list_dept():
@@ -50,7 +55,7 @@ def list_userprofile():
     return render_template('admin_userprofile.html',users = result ,username = username)
 
 
-
+## Update table rows
 @app.route('/update', methods=["POST"])
 def update():
     id_data = request.form['id']
@@ -87,6 +92,7 @@ def userprofile_update():
     return redirect(url_for('list_userprofile'))
 
 
+## Delete table rows 
 @app.route('/delete/<string:id_data>', methods=["GET"])
 def delete(id_data):
     cur = mysql.connection.cursor()
@@ -110,11 +116,17 @@ def delete_userprof(user_id):
 
 
 
-
+## add users 
 @app.route('/add_user',methods =["POST"])
 def add_user():
-    user = session["username"]
-    if 'admin' in user :
+    username = session["username"]
+    cur = mysql.connection.cursor()
+    cur.execute(''' SELECT users.username ,userprofile.is_admin
+                                  FROM users
+                                  LEFT JOIN userprofile ON users.user_id = userprofile.user_id
+                                  WHERE username = %s ''',(username,))
+    result = cur.fetchone()
+    if result[1] == 1 :
         username = request.form['username']
         password = request.form['password']
         dept_id = request.form['dept_id']
@@ -122,9 +134,9 @@ def add_user():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO users (username,password,dept_id,user_id) VALUES (%s,%s,%s,%s)",(username,password,dept_id,user_id))
         mysql.connection.commit()
+        cur.close()
         return redirect(url_for('list_employees'))
     else :
-        flash("Access Denied!")
         return redirect(url_for('list_employees'))
 
 @app.route('/add_dept',methods=['POST'])
@@ -142,18 +154,12 @@ def add_userprofile():
     prof_name = request.form["prof_name"]
     is_admin = request.form["is_admin"]
     cur = mysql.connection.cursor()
-    cur.execute(" INSERT INTO userprofile (user_id,prof_name,is_admin) VALUES (%s,%s,%s)",(dept_id,dept_name,is_admin))
+    cur.execute(" INSERT INTO userprofile (user_id,prof_name,is_admin) VALUES (%s,%s,%s)",(user_id,prof_name,is_admin))
     mysql.connection.commit()
     return redirect(url_for('list_userprofile'))
 
 
 
-##@app.route('/update_emp', methods=['GET', 'POST'])
-##def up():
-##    username = session["username"]
-##    return render_template('update_emp.html')
-
-    
 @app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('index1.html')
@@ -173,8 +179,14 @@ def login():
             if rows != None:
                 if rows[1] == username and rows[2] == password :
                     session['username'] = username
+                    c.execute(''' SELECT users.username ,userprofile.is_admin
+                                  FROM users
+                                  LEFT JOIN userprofile ON users.user_id = userprofile.user_id
+                                  WHERE username = %s ''', (username,))
+                    result = c.fetchone()
+                    if result[1] == 1 :
+                        return render_template("admin_logged_in.html", username = username) 
                     return redirect(url_for('sess'))
-                    #return render_template("logged_in.html" ,username = username)   
                 else :
                     flash("Plese enter correct password")
                     return render_template('index1.html')        
@@ -187,42 +199,10 @@ def login():
 def sess():
     if "username" in session:
         username = session["username"]
-        if 'admin' in username :
-            return render_template("admin_logged_in.html", username = username)
-        else:
-            return render_template("logged_in.html" ,username = username)
+        return render_template("logged_in.html" ,username = username)
     else:
         return render_template('index1.html')
     
-
-@app.route('/sign',methods = ['GET','POST'])
-def sign():
-    return render_template("signup.html")
-
-@app.route('/signup',methods=['POST','GET'])
-def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        repassword = request.form['repassword']
-        c = mysql.connection.cursor()
-        with c:
-            c.execute(''' SELECT * FROM users WHERE username LIKE (?) ''',( username,))
-            mysql.connection.commit()
-            row = c.fetchone()
-            if row == None :
-                if password == repassword :
-                    c.execute('''INSERT INTO users (username ,password) VALUES (?,?)''',(username,password))
-                    return render_template("index1.html")
-                else :
-                    flash("Password does not match ")
-                    return render_template('signup.html')
-            else :
-                flash ("Username already exists")
-                return render_template('signup.html')
-
-
-
 
 @app.route('/logout',methods=['POST','GET'])
 def logout():
