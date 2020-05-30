@@ -37,7 +37,7 @@ print(rows)
 
 c.execute(''' drop table if exists departments ''')
 c.execute(''' CREATE TABLE IF NOT EXISTS departments (
-               dept_id INT  auto_increment,
+               dept_id INT  ,
                dept_name TEXT ,
                PRIMARY KEY(dept_id)
 
@@ -80,9 +80,9 @@ print(rows)
 
 ## Add foreign key
 c.execute(''' ALTER TABLE users
-            ADD FOREIGN KEY (user_id) REFERENCES userprofile(user_id) ON UPDATE CASCADE ; ''')
+            ADD FOREIGN KEY (user_id) REFERENCES userprofile(user_id) ON UPDATE CASCADE ON DELETE CASCADE ; ''')
 c.execute(''' ALTER TABLE users
-            ADD FOREIGN KEY (dept_id) REFERENCES departments (dept_id) ON UPDATE CASCADE ; ''' )
+            ADD FOREIGN KEY (dept_id) REFERENCES departments (dept_id) ON UPDATE CASCADE ON DELETE CASCADE ; ''' )
 
 
 
