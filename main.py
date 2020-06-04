@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import render_template ,request ,flash,session,redirect,url_for
 from flask_mysqldb import MySQL
-from flask_table import Table,Col
-import pymysql
+##from flask_table import Table,Col
+##import pymysql
 
 
 app = Flask(__name__)
@@ -16,8 +16,8 @@ app.config['SECRET_KEY'] = "My Super Secret Key"
 mysql = MySQL(app)
 
 ## List table rows
-@app.route('/session/emp',methods=['GET','POST'])
-def list_employees():
+@app.route('/session/emp/<string:username>',methods=['GET','POST'])
+def list_employees(username):
     username = session["username"]
     cur = mysql.connection.cursor()
     cur.execute(''' SELECT users.username ,userprofile.is_admin
@@ -34,10 +34,10 @@ def list_employees():
         cur.execute ("SELECT * FROM users where username = %s",(username,))
         result = cur.fetchall()
         cur.close()
-        return render_template('employees.html', users=result, username = username)\
+        return render_template('employees.html', users=result, username = username)
 
-@app.route('/session/dept',methods =['GET','POST'])
-def list_dept():
+@app.route('/session/dept/<string:username>',methods =['GET','POST'])
+def list_dept(username):
     username = session["username"]
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM departments")
@@ -45,8 +45,8 @@ def list_dept():
     cur.close()
     return render_template('admin_dept.html',users = result ,username = username)
 
-@app.route('/session/userprofile',methods =['GET','POST'])
-def list_userprofile():
+@app.route('/session/userprofile/<string:username>',methods =['GET','POST'])
+def list_userprofile(username):
     username = session["username"]
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM userprofile")
@@ -185,8 +185,9 @@ def login():
                                   WHERE username = %s ''', (username,))
                     result = c.fetchone()
                     if result[1] == 1 :
-                        return render_template("admin_logged_in.html", username = username) 
-                    return redirect(url_for('sess'))
+                        return render_template("admin_logged_in.html", username = username)
+                    
+                    #return redirect(url_for('sess'))
                 else :
                     flash("Plese enter correct password")
                     return render_template('index1.html')        
